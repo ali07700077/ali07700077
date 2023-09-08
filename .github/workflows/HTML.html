@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الأوامر</title>
+    <style>
+        /* تصميم الصفحة باستخدام CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #007BFF;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+        }
+
+        .container {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 90%;
+            max-width: 800px; /* زيادة عرض الصفحة */
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p#message {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px; /* مساحة بين النموذج والجدول */
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* تصميم الكتب المحملة */
+        .book-list {
+            margin-top: 20px; /* مساحة بين الجدول والقائمة */
+        }
+
+        .book-list label {
+            font-weight: normal; /* تقليل وزن النص */
+        }
+
+        .book-list select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>أرشفة الكتب</h1>
+    <!-- حقل البحث هنا -->
+    <label for="searchBook">البحث عن كتاب:</label>
+    <input type="text" id="searchBook" name="searchBook">
+    <br>
+    <button type="button" id="searchButton" onclick="showSearchingMessage()">بحث</button>
+    <br>
+</div>
+<div class="container">
+    <!-- نموذج لإضافة كتاب جديد -->
+    <form id="addBookForm">
+        <label for="bookNumber">رقم الكتاب:</label>
+        <input type="text" id="bookNumber" name="bookNumber" required>
+        <br>
+        <label for="bookDate">تاريخ الكتاب:</label>
+        <input type="date" id="bookDate" name="bookDate" required>
+        <br>
+        <label for="bookSubject">الموضوع:</label>
+        <input type="text" id="bookSubject" name="bookSubject" required>
+        <br>
+        <label for="bookDetails">التفاصيل:</label>
+        <textarea id="bookDetails" name="bookDetails" rows="4" required></textarea>
+        <br>
+        <label for="directorName">اسم المديرية:</label>
+        <select id="directorName" name="directorName" required>
+            <option value="1">1. مديرية العمليات</option>
+            <option value="2">2. مديرية الق<option value="1">1. مديرية العمليات</option>
+            <option value="2">2. مديرية القانونية</option>
+            <option value="3">3. القائد رة</option>
+            <option value="4">4. صور داد</option>
+            <option value="5">5. مديرية الإدارية والمالية</option>
+            <option value="6">6. حمديية</option>
+            <option value="7">7. جنديب</option>
+            <option value="8">8. صكاررف</option>
+        </select>
+        <br>
+        <label for="bookFile">ملف الكتاب:</label>
+        <input type="file" id="bookFile" name="bookFile" accept=".pdf, .doc, .docx" onchange="showFileName();">
+        <br>
+        <!-- مكان لعرض اسم الملف بعد الرفع -->
+        <div id="fileInfo" style="display: none;">
+            <label for="fileName">اسم الملف:</label>
+            <span id="bookFileName"></span>
+            <br>
+        </div>
+        <button type="button" id="addBookButton" onclick="addBook()">إضافة الكتاب</button>
+    </form>
+
+    <!-- رسالة جاري البحث عن الكتاب -->
+    <p id="searchingMessage" style="display: none;">جاري البحث عن الكتاب...</p>
+    <!-- رسالة تم إضافة الكتاب بنجاح -->
+    <p id="successMessage" style="display: none; color: green;">تم إضافة الكتاب بنجاح!</p>
+    <!-- جدول لعرض الكتب المضافة -->
+    <table>
+        <thead>
+        <tr>
+            <th>رقم الكتاب</th>
+            <th>تاريخ الكتاب</th>
+            <th>الموضوع</th>
+            <th>التفاصيل</th>
+            <th>اسم المديرية</th>
+            <th>عرض الكتاب</th>
+        </tr>
+        </thead>
+        <tbody id="bookTableBody">
+        <!-- هنا سيتم إضافة الكتب -->
+        </tbody>
+    </table>
+    <!-- قائمة لعرض الكتب المحملة -->
+    <div class="book-list">
+        <label for="loadedBooks">عرض الكتب المحملة:</label>
+        <select id="loadedBooks" name="loadedBooks">
+            <!-- يمكنك إضافة خيارات هنا بناءً على الكتب المحملة -->
+        </select>
+    </div>
+</div>
+<script>
+    // الأمر الذي يقوم بعرض رسالة "جاري البحث عن الكتاب" وبعد ذلك استدعاء showSuccessMessage بعد فترة زمنية
+    function showSearchingMessage() {
+        document.getElementById("searchBook").style.display = "none";
+        document.getElementById("searchButton").style.display = "none";
+        document.getElementById("searchingMessage").style.display = "block";
+        setTimeout(showSuccessMessage, 2000); // استبدل هذا بعرض النتائج الفعلية
+    }
+
+    // استدعاء هذا الأمر عندما يتم رفع ملف الكتاب لعرض اسم الملف
+    function showFileName() {
+        const fileInput = document.getElementById("bookFile");
+        const fileInfo = document.getElementById("fileInfo");
+        const fileName = document.getElementById("bookFileName");
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
+            fileInfo.style.display = "block";
+        } else {
+            fileInfo.style.display = "none";
+        }
+    }
+
+    // استدعاء هذا الأمر عند النقر على زر "إضافة الكتاب"
+    function addBook() {
+// هنا يمكنك كتابة الكود الذي يقوم بإضافة الكتاب إلى الجدول
+        // يمكنك استخدام القيم المدخلة من النموذج لإنشاء صف جديد وإضافته للجدول
+        // بالإضافة إلى إظهار رسالة تأكيد بعد الإضافة بنجاح
+
+        const bookTable = document.getElementById("bookTableBody");
+        const newRow = bookTable.insertRow(-1);
+
+        const bookNumber = newRow.insertCell(0);
+        bookNumber.innerHTML = document.getElementById("bookNumber").value;
+
+        const bookDate = newRow.insertCell(1);
+        bookDate.innerHTML = document.getElementById("bookDate").value;
+
+        const bookSubject = newRow.insertCell(2);
+        bookSubject.innerHTML = document.getElementById("bookSubject").value;
+
+        const bookDetails = newRow.insertCell(3);
+        bookDetails.innerHTML = document.getElementById("bookDetails").value;
+
+        const directorName = newRow.insertCell(4);
+        const directorSelect = document.getElementById("directorName");
+        directorName.innerHTML = directorSelect.options[directorSelect.selectedIndex].text;
+
+        const viewButton = newRow.insertCell(5);
+        const viewLink = document.createElement("a");
+        viewLink.textContent = "عرض";
+        // قم بتعيين الرابط الذي يحمل اسم الملف الذي تم رفعه
+        // مثال: viewLink.href = "books/اسم_الملف.pdf";
+        // حيث تقوم بوضع مسار الملف بدلاً من "books/اسم_الملف.pdf"
+        viewButton.appendChild(viewLink);
+
+        // إعادة تعيين حقول النموذج
+        document.getElementById("bookNumber").value = "";
+        document.getElementById("bookDate").value = "";
+        document.getElementById("bookSubject").value = "";
+        document.getElementById("bookDetails").value = "";
+        document.getElementById("directorName").selectedIndex = 0;
+        document.getElementById("bookFile").value = "";
+
+        // إظهار رسالة تأكيد
+        const successMessage = document.getElementById("successMessage");
+        successMessage.textContent = "تم إضافة الكتاب بنجاح";
+        successMessage.style.display = "block";
+    }
+
+    // اسم الملف الذي تم رفعه
+    function showSuccessMessage() {
+        document.getElementById("searchingMessage").style.display = "none";
+        const successMessage = document.getElementById("successMessage");
+        successMessage.style.display = "block";
+
+        // استبدل هذا بعرض صفحة الأزمر الفعلية
+        // يمكنك تحديد الرابط الذي يحمل الأزمر هنا
+        // مثال: window.location.href = "azmar.html";
+    }
+</script>
+</body>
+</html>
